@@ -55,15 +55,7 @@ function ensureLoggedIn(req, res, next) {
 // ======== Routes ========
 app.get('/', (req, res) => res.render('./auth/login'));
 app.get('/signup', (req, res) => res.render('./auth/signup'));
-app.get('/home', ensureLoggedIn, async (req, res) => {
-  const userId = req.session.userId;
-  // Calculate budget, totalExpense, remaining, etc.
-  let budget = 0; // replace with actual logic
-  let totalExpense = 0; // sum from expenses
-  let remaining = budget - totalExpense;
-  res.render('./page/home', { budget, totalExpense, remaining });
-});
-
+app.get('/home', ensureLoggedIn, (req, res) => res.render('./page/home'));
 
 // ======== User Signup Route ========
 app.post('/create', async (req, res) => {
@@ -91,8 +83,7 @@ app.post('/create', async (req, res) => {
     res.status(201).json({ success: true, message: 'User created. Verification code sent to email.' });
   } catch (error) {
     if (error.code === 11000) {
-      // Use a fallback if error.keyPattern is undefined
-      let field = error.keyPattern ? Object.keys(error.keyPattern)[0] : 'Field';
+      let field = Object.keys(error.keyPattern)[0];
       res.status(400).json({ success: false, message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.` });
     } else {
       console.error('Error creating user:', error);
