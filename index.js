@@ -10,12 +10,14 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+
 // ======== Database ========
 mongoose.connect('mongodb://localhost:27017/Expense-managementDB', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 console.log('Connected to MongoDB successfully');
+
 
 // ======== Express Session ========
 app.use(session({
@@ -26,10 +28,12 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 },
 }));
 
+
 // ======== Middlewares ========
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
+
 
 // ======== Nodemailer ========
 const transporter = nodemailer.createTransport({
@@ -40,16 +44,26 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+
 // ======== Session Auth Middleware ========
 function ensureLoggedIn(req, res, next) {
   if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
   next();
 }
 
+
 // ======== Routes ========
 app.get('/', (req, res) => res.render('./auth/login'));
 app.get('/signup', (req, res) => res.render('./auth/signup'));
-app.get('/home', ensureLoggedIn, (req, res) => res.render('./page/home'));
+app.get('/home', ensureLoggedIn, async (req, res) => {
+  const userId = req.session.userId;
+  // Calculate budget, totalExpense, remaining, etc.
+  let budget = 0; // replace with actual logic
+  let totalExpense = 0; // sum from expenses
+  let remaining = budget - totalExpense;
+  res.render('./page/home', { budget, totalExpense, remaining });
+});
+
 
 // ======== User Signup Route ========
 app.post('/create', async (req, res) => {
@@ -77,7 +91,8 @@ app.post('/create', async (req, res) => {
     res.status(201).json({ success: true, message: 'User created. Verification code sent to email.' });
   } catch (error) {
     if (error.code === 11000) {
-      let field = Object.keys(error.keyPattern)[0];
+      // Use a fallback if error.keyPattern is undefined
+      let field = error.keyPattern ? Object.keys(error.keyPattern)[0] : 'Field';
       res.status(400).json({ success: false, message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.` });
     } else {
       console.error('Error creating user:', error);
@@ -85,6 +100,7 @@ app.post('/create', async (req, res) => {
     }
   }
 });
+
 
 // ======== Email Verification Routes ========
 app.post('/verify-email', async (req, res) => {
@@ -101,6 +117,7 @@ app.post('/verify-email', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
 
 app.post('/resend-code', async (req, res) => {
   try {
@@ -128,6 +145,7 @@ app.post('/resend-code', async (req, res) => {
   }
 });
 
+
 // ======== Login Route (sets session) ========
 app.post('/check', async (req, res) => {
   try {
@@ -153,11 +171,13 @@ app.post('/check', async (req, res) => {
   }
 });
 
+
 // ======== Logout Route ========
 app.post('/logout', (req, res) => {
   req.session.destroy();
   res.json({ success: true, message: 'Logged out' });
 });
+
 
 // ======== Expenses CRUD Routes (protected) ========
 app.get('/expenses', ensureLoggedIn, async (req, res) => {
@@ -169,6 +189,7 @@ app.get('/expenses', ensureLoggedIn, async (req, res) => {
     res.status(500).json({ error: 'Error fetching expenses' });
   }
 });
+
 
 app.post('/expenses', ensureLoggedIn, async (req, res) => {
   try {
@@ -184,6 +205,7 @@ app.post('/expenses', ensureLoggedIn, async (req, res) => {
   }
 });
 
+
 app.delete('/expenses/:id', ensureLoggedIn, async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -195,10 +217,7 @@ app.delete('/expenses/:id', ensureLoggedIn, async (req, res) => {
     res.status(500).json({ error: 'Error deleting expense' });
   }
 });
-app.post('/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ success: true, message: 'Logged out' });
-});
+
 
 // ======== Start Server ========
 app.listen(8000, () => {
