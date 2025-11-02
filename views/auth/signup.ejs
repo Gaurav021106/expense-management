@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E-commerce Signup</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+  <div class="w-screen h-screen flex bg-[#EFF2F1] items-center justify-center">
+    <div
+      class="w-[30%] h-[70%] rounded-4xl bg-[#61E8E1] p-3 flex flex-col justify-center items-center gap-4 transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+    >
+      <form id="signupForm" class="w-full flex flex-col justify-center items-center gap-4" autocomplete="off">
+        <h1 class="font-bold text-center text-3xl font-serif">Expense Management</h1>
+        <h2 class="font-bold text-center text-xl">SignUp</h2>
+
+        <input
+          type="text"
+          class="text-sm w-[90%] rounded-3xl h-[5vh] bg-[#EFF2F1] text-center font-bold transition-transform duration-300 hover:scale-105 cursor-pointer"
+          name="username"
+          placeholder="username"
+          required
+          autocomplete="username"
+        />
+        <input
+          type="email"
+          class="text-sm w-[90%] rounded-3xl h-[5vh] bg-[#EFF2F1] text-center font-bold transition-transform duration-300 hover:scale-105 cursor-pointer"
+          name="email"
+          placeholder="email"
+          required
+          autocomplete="email"
+        />
+        <input
+          type="password"
+          class="text-sm w-[90%] rounded-3xl h-[5vh] bg-[#EFF2F1] text-center font-bold transition-transform duration-300 hover:scale-105 cursor-pointer"
+          name="password"
+          placeholder="password"
+          required
+          autocomplete="new-password"
+        />
+
+        <!-- Verification input, NOT required until visible -->
+        <input
+          type="text"
+          id="verificationCodeInput"
+          class="text-sm w-[90%] rounded-3xl h-[5vh] bg-[#EFF2F1] text-center font-bold transition-transform duration-300 hover:scale-105 cursor-pointer hidden"
+          name="verificaton_code"
+          placeholder="Enter verification code"
+          autocomplete="one-time-code"
+        />
+
+        <button
+          id="submitBtn"
+          type="submit"
+          class="text-center text-xl font-bold bg-blue-400 hover:bg-blue-600 cursor-pointer transition-transform duration-300 hover:scale-105 w-[70%] p-2 rounded-3xl"
+        >
+          Signup
+        </button>
+      </form>
+
+      <button
+        id="resendBtn"
+        type="button"
+        class="text-center text-lg font-semibold bg-green-400 hover:bg-green-600 cursor-pointer transition-transform duration-300 hover:scale-105 w-[70%] p-2 rounded-3xl hidden"
+      >
+        Resend Verification Code
+      </button>
+
+      <p>
+        Already have an account?
+        <a class="underline" href="/">Login</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("signupForm");
+    const verificationInput = document.getElementById("verificationCodeInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const resendBtn = document.getElementById("resendBtn");
+
+    let signupData = null; // to store email for resending
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Step 1: Signup user
+      if (verificationInput.classList.contains("hidden")) {
+        const formData = new FormData(form);
+        const username = formData.get("username");
+        const email = formData.get("email");
+        const password = formData.get("password");
+
+        try {
+          const response = await fetch("/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+          });
+          const result = await response.json();
+
+          if (result.success) {
+            alert(result.message);
+            signupData = { email }; // save for resend
+
+            // Show verification field and resend button
+            verificationInput.classList.remove("hidden");
+            verificationInput.required = true; // Only required when visible
+            resendBtn.classList.remove("hidden");
+
+            // Disable signup inputs (to fix and prevent change)
+            form.elements["username"].disabled = true;
+            form.elements["email"].disabled = true;
+            form.elements["password"].disabled = true;
+
+            submitBtn.textContent = "Verify Email";
+          } else {
+            alert(result.message || "Error during signup");
+          }
+        } catch (error) {
+          alert("Error communicating with server.");
+          console.error(error);
+        }
+      }
+      // Step 2: Verify code
+      else {
+        const verificationCode = verificationInput.value.trim();
+        if (!verificationCode) {
+          alert("Please enter the verification code.");
+          return;
+        }
+        try {
+          const response = await fetch("/verify-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: signupData.email, verificationCode }),
+          });
+          const result = await response.json();
+          if (result.success) {
+            alert("Email verified! You can now login.");
+            window.location.href = "/home";
+          } else {
+            alert(result.message || "Invalid verification code.");
+          }
+        } catch (error) {
+          alert("Error verifying code.");
+          console.error(error);
+        }
+      }
+    });
+
+    resendBtn.addEventListener("click", async () => {
+      if (!signupData || !signupData.email) {
+        alert("Email missing. Please signup first.");
+        return;
+      }
+      try {
+        const response = await fetch("/resend-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: signupData.email }),
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert("Verification code resent to your email.");
+        } else {
+          alert(result.message || "Error resending code.");
+        }
+      } catch (error) {
+        alert("Error contacting server.");
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>

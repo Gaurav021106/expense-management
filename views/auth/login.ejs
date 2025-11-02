@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Management - Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+  <div class="w-screen h-screen flex bg-[#EFF2F1] items-center justify-center">
+    <div class="w-[30%] h-[70%] rounded-4xl bg-[#61E8E1] p-3 flex flex-col justify-center items-center gap-4 transform transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+      <form id="login-form" class="w-full flex flex-col justify-center items-center gap-4">
+        <h1 class="font-bold text-center text-3xl font-serif">Expense Management</h1>
+        <h2 class="font-bold text-center text-xl">Welcome Back</h2>
+        <input type="text"
+          class="text-sm w-[90%] rounded-3xl h-[5vh] bg-[#EFF2F1] text-center font-bold"
+          name="username" id="username" placeholder="username or email" required>
+        <input type="password"
+          class="text-sm w-[90%] rounded-3xl h-[5vh] bg-[#EFF2F1] text-center font-bold"
+          name="password" id="password" placeholder="password" required>
+        <input type="text"
+          class="text-sm w-[90%] rounded-3xl h-[5vh] bg-[#EFF2F1] text-center font-bold hidden"
+          name="verification_code" id="verification-code"
+          placeholder="Enter verification code">
+
+        <button id="loginbtn"
+          type="submit"
+          class="text-center text-xl font-bold bg-blue-400 hover:bg-blue-600 cursor-pointer transition-transform hover:scale-105 w-[70%] p-2 rounded-3xl">
+          Login
+        </button>
+        <p class="text-red-600 font-bold text-sm mt-1" id="error-msg"></p>
+      </form>
+      <p>
+        Don't have an account?
+        <a class="underline" href="/signup">SignUp</a>
+      </p>
+    </div>
+  </div>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errorMsg = document.getElementById('error-msg');
+      errorMsg.textContent = '';
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const verificationInput = document.getElementById('verification-code');
+
+      // If visible, attempt verification first
+      if (!verificationInput.classList.contains('hidden')) {
+        const verificationCode = verificationInput.value.trim();
+        if (!verificationCode) {
+          errorMsg.textContent = 'Please enter verification code.';
+          return;
+        }
+        // Verify code
+        const res = await fetch('/verify-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: username, verificationCode })
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Now try login again, will pass!
+          verificationInput.classList.add('hidden');
+          this.reset();
+          window.location.href = '/home';
+        } else {
+          errorMsg.textContent = data.message || 'Verification failed.';
+        }
+        return;
+      }
+
+      // Normal login POST
+      const res = await fetch('/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = '/home';
+      } else if (data.emailVerificationRequired) {
+        errorMsg.textContent = data.message || 'Email not verified';
+        verificationInput.classList.remove('hidden');
+        verificationInput.focus();
+      } else {
+        errorMsg.textContent = data.message || 'Login failed';
+      }
+    });
+  </script>
+</body>
+</html>

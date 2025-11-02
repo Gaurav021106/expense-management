@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <div class="w-full bg-green-400 text-center p-5 border-b-2 border-black flex items-center justify-between">
+        <h1 class="text-3xl font-bold w-full text-center">Expense Management</h1>
+        <button id="logoutBtn"
+            class="absolute right-6 top-5 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+            Logout
+        </button>
+    </div>
+
+    <div class="container mx-auto my-5 p-5 bg-white border border-black rounded-lg w-[95%] max-w-4xl">
+        <h2 class="text-center text-xl font-bold bg-green-400 border border-black px-4 py-2 mb-5 rounded">Set Budget
+        </h2>
+        <form id="set-budget-form" class="flex flex-wrap gap-3 justify-center items-center">
+            <label for="budget" class="text-lg font-bold mr-2">Set Budget:</label>
+            <input type="number" id="budget" placeholder="Enter your budget" required
+                class="text-center border border-black rounded px-3 py-2 font-bold w-44" />
+            <button type="submit" id="set-budget-btn"
+                class="bg-lime-400 hover:bg-lime-600 text-black font-bold rounded px-6 py-2 cursor-pointer w-36">Set</button>
+        </form>
+        <div class="flex flex-wrap justify-around mt-5 gap-5">
+            <div class="w-48 bg-green-50 p-4 border border-black rounded text-center">
+                <h3 class="mb-2 font-semibold">Current Budget:</h3>
+                <div id="display-budget" class="text-2xl font-bold">₹0</div>
+            </div>
+            <div class="w-48 bg-green-50 p-4 border border-black rounded text-center">
+                <h3 class="mb-2 font-semibold">Total Expense:</h3>
+                <div id="display-expense" class="text-2xl font-bold">₹0</div>
+            </div>
+            <div class="w-48 bg-green-50 p-4 border border-black rounded text-center">
+                <h3 class="mb-2 font-semibold">Remaining:</h3>
+                <div id="display-remaining" class="text-2xl font-bold">₹0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto my-5 p-5 bg-white border border-black rounded-lg w-[95%] max-w-4xl">
+        <h2 class="text-center text-xl font-bold bg-green-400 border border-black px-4 py-2 mb-5 rounded">Add Expense
+        </h2>
+        <form id="add-expense-form" class="flex flex-wrap gap-3 justify-center items-center">
+            <label for="expense-name" class="text-lg font-bold mr-2 w-full sm:w-auto">Expense Name:</label>
+            <input type="text" id="expense-name" placeholder="Enter expense name" required
+                class="text-center border border-black rounded px-3 py-2 font-bold w-full sm:w-44" />
+            <label for="expense-date" class="text-lg font-bold mr-2 w-full sm:w-auto">Date:</label>
+            <input type="date" id="expense-date" required
+                class="border border-black rounded px-3 py-2 font-bold w-full sm:w-44" />
+            <label for="expense-amount" class="text-lg font-bold mr-2 w-full sm:w-auto">Amount:</label>
+            <input type="number" id="expense-amount" placeholder="Enter amount" required
+                class="text-center border border-black rounded px-3 py-2 font-bold w-full sm:w-44" />
+            <button type="submit" id="add-expense-btn"
+                class="bg-lime-400 hover:bg-lime-600 text-black font-bold rounded px-6 py-2 cursor-pointer w-36">Add</button>
+        </form>
+    </div>
+
+    <div class="container mx-auto my-5 p-5 bg-white border border-black rounded-lg w-[95%] max-w-4xl">
+        <h2 class="text-center text-xl font-bold bg-green-400 border border-black px-4 py-2 mb-5 rounded">Expense List
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse border border-black text-center">
+                <thead>
+                    <tr class="bg-green-400 border border-black">
+                        <th class="border border-black py-3 px-4">Expense Name</th>
+                        <th class="border border-black py-3 px-4">Date</th>
+                        <th class="border border-black py-3 px-4">Amount (₹)</th>
+                        <th class="border border-black py-3 px-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-list">
+                    <!-- Dynamic rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Variable declarations (always declare!)
+        const budgetInput = document.getElementById('budget');
+        const budgetDisplay = document.getElementById('display-budget');
+        const expenseDisplay = document.getElementById('display-expense');
+        const remainingDisplay = document.getElementById('display-remaining');
+        const expenseList = document.getElementById('expense-list');
+
+        let budget = 0;
+        let totalExpense = 0;
+        let remaining = 0;
+
+        document.getElementById('set-budget-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (budgetInput.value === '' || isNaN(budgetInput.value) || parseFloat(budgetInput.value) <= 0) {
+                alert("Please enter a valid budget amount");
+                return;
+            }
+            budget = parseFloat(budgetInput.value);
+            updateDisplays();
+            budgetInput.value = '';
+        });
+        document.getElementById('logoutBtn').addEventListener('click', async function () {
+            try {
+                const res = await fetch('/logout', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                alert('Logout failed. Try again.');
+            }
+        });
+
+
+        function updateDisplays() {
+            remaining = budget - totalExpense;
+            budgetDisplay.textContent = `₹${budget}`;
+            expenseDisplay.textContent = `₹${totalExpense}`;
+            remainingDisplay.textContent = `₹${remaining}`;
+        }
+
+        async function fetchExpenses() {
+            try {
+                const res = await fetch('/expenses');
+                const expenses = await res.json();
+                let total = 0;
+                expenseList.innerHTML = '';
+                expenses.forEach(expense => {
+                    total += expense.amount;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+            <td>${expense.name}</td>
+            <td>${expense.date ? expense.date.split("T")[0] : ''}</td>
+            <td>₹${expense.amount}</td>
+            <td><button onclick="deleteExpense('${expense._id}')" class="bg-red-400 hover:bg-red-600 text-white font-bold rounded px-3 py-1">Delete</button></td>
+          `;
+                    expenseList.appendChild(row);
+                });
+                totalExpense = total;
+                updateDisplays();
+            } catch (error) {
+                alert("Error fetching expenses!");
+            }
+        }
+
+        document.getElementById('add-expense-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('expense-name').value.trim();
+            const date = document.getElementById('expense-date').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            if (!name || !date || isNaN(amount) || amount <= 0) {
+                alert("Please enter valid values for all fields. Amount must be > 0.");
+                return;
+            }
+            try {
+                await fetch('/expenses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, amount, date })
+                });
+                this.reset();
+                fetchExpenses();
+            } catch (error) {
+                alert('Failed to add expense!');
+            }
+        });
+
+        async function deleteExpense(id) {
+            try {
+                await fetch(`/expenses/${id}`, { method: 'DELETE' });
+                fetchExpenses();
+            } catch (error) {
+                alert('Failed to delete expense!');
+            }
+        }
+
+        // On page load
+        window.onload = function () {
+            fetchExpenses();
+        };
+    </script>
+</body>
+
+</html>
