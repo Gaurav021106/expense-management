@@ -1,113 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Expense Management - Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+
 <body>
   <div class="w-screen h-screen flex bg-gradient-to-br from-green-100 via-lime-300 to-green-200 items-center justify-center">
     <!-- Animated Card -->
     <div class="w-[350px] sm:w-[30%] h-[500px] sm:h-[60%] rounded-3xl bg-gradient-to-tr from-[#61E8E1] via-lime-200 to-[#61E8E1] p-5 flex flex-col justify-center items-center gap-6 shadow-2xl animate-slideUp transition-transform duration-300 hover:scale-105 hover:shadow-green-400">
-        <form id="login-form" class="w-full flex flex-col justify-center items-center gap-4">
-            <h1 class="font-bold text-center text-3xl font-serif text-green-600 drop-shadow-lg animate-fadeIn">Expense Management</h1>
-            <h2 class="font-bold text-center text-xl text-green-900">Welcome Back</h2>
-            <input type="text"
-                class="text-md w-[90%] rounded-2xl h-[45px] bg-[#EFF2F1] border-2 border-lime-400 focus:border-green-400 focus:ring-2 focus:ring-green-400 text-center font-bold shadow transition-all duration-300 placeholder:text-gray-400"
-                name="username" id="username" placeholder="Username or Email" required>
-            <input type="password"
-                class="text-md w-[90%] rounded-2xl h-[45px] bg-[#EFF2F1] border-2 border-lime-400 focus:border-green-400 focus:ring-2 focus:ring-green-400 text-center font-bold shadow transition-all duration-300 placeholder:text-gray-400"
-                name="password" id="password" placeholder="Password" required>
-            <input type="text"
-                class="text-md w-[90%] rounded-2xl h-[45px] bg-[#EFF2F1] border-2 border-lime-400 focus:border-green-400 focus:ring-2 focus:ring-green-400 text-center font-bold hidden"
-                name="verification_code" id="verification-code" placeholder="Enter verification code">
-            <button
-                id="loginbtn"
-                type="submit"
-                class="text-center text-xl font-bold bg-lime-400 hover:bg-lime-600 text-green-900 hover:text-white cursor-pointer transition-all duration-300 hover:scale-105 w-[70%] py-2 rounded-2xl shadow-lg active:scale-95 animate-fadeInSlow"
-            >
-                Login
-            </button>
-            <p class="text-red-600 font-bold text-sm mt-1" id="error-msg"></p>
-        </form>
-        <p class="font-semibold text-green-900">
-            Don't have an account?
-            <a class="underline text-lime-600 hover:text-lime-800 transition" href="/signup">SignUp</a>
-        </p>
+      <form id="login-form" class="w-full flex flex-col justify-center items-center gap-4">
+        <h1 class="font-bold text-center text-3xl font-serif text-green-600 drop-shadow-lg animate-fadeIn">Expense Management</h1>
+        <h2 class="font-bold text-center text-xl text-green-900">Welcome Back</h2>
+
+        <!-- Username/Email Input -->
+        <input 
+          type="text"
+          class="text-md w-[90%] rounded-2xl h-[45px] bg-[#EFF2F1] border-2 border-lime-400 focus:border-green-400 focus:ring-2 focus:ring-green-400 text-center font-bold shadow transition-all duration-300 placeholder:text-gray-400"
+          name="username" 
+          id="username" 
+          placeholder="Username or Email" 
+          required>
+
+        <!-- Password Input -->
+        <input 
+          type="password"
+          class="text-md w-[90%] rounded-2xl h-[45px] bg-[#EFF2F1] border-2 border-lime-400 focus:border-green-400 focus:ring-2 focus:ring-green-400 text-center font-bold shadow transition-all duration-300 placeholder:text-gray-400"
+          name="password" 
+          id="password" 
+          placeholder="Password" 
+          required>
+
+        <!-- Verification Code Input (Hidden by default) -->
+        <input 
+          type="text"
+          class="text-md w-[90%] rounded-2xl h-[45px] bg-[#EFF2F1] border-2 border-lime-400 focus:border-green-400 focus:ring-2 focus:ring-green-400 text-center font-bold shadow transition-all duration-300 placeholder:text-gray-400 hidden"
+          name="verification_code" 
+          id="verification-code" 
+          placeholder="Enter verification code">
+
+        <!-- Error Message Display -->
+        <p class="text-red-600 font-bold text-sm mt-1 min-h-[1.5rem]" id="error-msg"></p>
+
+        <!-- Login Button -->
+        <button 
+          id="loginbtn" 
+          type="submit"
+          class="text-center text-xl font-bold bg-lime-400 hover:bg-lime-600 text-green-900 hover:text-white cursor-pointer transition-all duration-300 hover:scale-105 w-[70%] py-2 rounded-2xl shadow-lg active:scale-95 animate-fadeInSlow">
+          Login
+        </button>
+
+        <!-- Resend Code Button (Hidden by default) -->
+        <button 
+          id="resend-btn"
+          type="button"
+          class="text-center text-lg font-semibold bg-green-400 hover:bg-green-600 text-green-900 hover:text-white cursor-pointer transition-all duration-300 hover:scale-105 w-[70%] py-2 rounded-2xl shadow-lg active:scale-95 hidden">
+          Resend Verification Code
+        </button>
+      </form>
+
+      <!-- Signup Link -->
+      <p class="font-semibold text-green-900">
+        Don't have an account?
+        <a class="underline text-lime-600 hover:text-lime-800 transition" href="/signup">SignUp</a>
+      </p>
     </div>
 
-    <!-- Add KeyFrame Animations and Responsive Fixes -->
+    <!-- Animations and Responsive Styles -->
     <style>
-        .animate-fadeIn { animation: fadeIn 1s ease-out; }
-        .animate-fadeInSlow { animation: fadeIn 2s ease-out; }
-        .animate-slideUp { animation: slideUp 1.2s ease; }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
+      .animate-fadeIn {
+        animation: fadeIn 1s ease-out;
+      }
+
+      .animate-fadeInSlow {
+        animation: fadeIn 2s ease-out;
+      }
+
+      .animate-slideUp {
+        animation: slideUp 1.2s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px);}
-            to   { opacity: 1; transform: translateY(0);}
+        to {
+          opacity: 1;
         }
-        @media (max-width: 700px) {
-            .w-[30%], .w-[350px] { width: 92vw !important; }
-            .h-[60%], .h-[500px] { height: 90vw !important; }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 700px) {
+        .w-[30%],
+        .w-[350px] {
+          width: 92vw !important;
+        }
+
+        .h-[60%],
+        .h-[500px] {
+          height: 90vw !important;
+        }
+      }
     </style>
-</div>
+  </div>
 
   <script>
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const errorMsg = document.getElementById('error-msg');
-      errorMsg.textContent = '';
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const verificationInput = document.getElementById('verification-code');
+    const loginForm = document.getElementById('login-form');
+    const errorMsg = document.getElementById('error-msg');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const verificationInput = document.getElementById('verification-code');
+    const resendBtn = document.getElementById('resend-btn');
+    let storedEmail = '';
 
-      // If visible, attempt verification first
+    // Handle Login Form Submission
+    loginForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      errorMsg.textContent = '';
+
+      // Check if verification code is visible (in verification mode)
       if (!verificationInput.classList.contains('hidden')) {
-        const verificationCode = verificationInput.value.trim();
-        if (!verificationCode) {
-          errorMsg.textContent = 'Please enter verification code.';
-          return;
-        }
-        // Verify code
-        const res = await fetch('/verify-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: username, verificationCode })
-        });
-        const data = await res.json();
-        if (data.success) {
-          // Now try login again, will pass!
-          verificationInput.classList.add('hidden');
-          this.reset();
-          window.location.href = '/home';
-        } else {
-          errorMsg.textContent = data.message || 'Verification failed.';
-        }
+        await handleVerification();
         return;
       }
 
-      // Normal login POST
-      const res = await fetch('/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-      if (data.success) {
-        window.location.href = '/home';
-      } else if (data.emailVerificationRequired) {
-        errorMsg.textContent = data.message || 'Email not verified';
-        verificationInput.classList.remove('hidden');
-        verificationInput.focus();
-      } else {
-        errorMsg.textContent = data.message || 'Login failed';
+      // Normal login mode
+      await handleLogin();
+    });
+
+    // Handle Login
+    async function handleLogin() {
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!username || !password) {
+        errorMsg.textContent = 'Please enter username and password.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          window.location.href = '/home';
+        } else if (data.emailVerificationRequired) {
+          errorMsg.textContent = data.message || 'Email verification required. Check your inbox.';
+          storedEmail = username; // Store email for verification
+          usernameInput.disabled = true;
+          passwordInput.disabled = true;
+          verificationInput.classList.remove('hidden');
+          resendBtn.classList.remove('hidden');
+          verificationInput.focus();
+        } else {
+          errorMsg.textContent = data.message || 'Login failed. Please try again.';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Network error. Please try again.';
+        console.error('Login error:', error);
+      }
+    }
+
+    // Handle Email Verification
+    async function handleVerification() {
+      const verificationCode = verificationInput.value.trim();
+
+      if (!verificationCode) {
+        errorMsg.textContent = 'Please enter the verification code.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/verify-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: storedEmail, verificationCode })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          errorMsg.textContent = '';
+          window.location.href = '/home';
+        } else {
+          errorMsg.textContent = data.message || 'Invalid verification code.';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Verification failed. Please try again.';
+        console.error('Verification error:', error);
+      }
+    }
+
+    // Handle Resend Verification Code
+    resendBtn.addEventListener('click', async function (e) {
+      e.preventDefault();
+      resendBtn.disabled = true;
+      resendBtn.textContent = 'Sending...';
+
+      try {
+        const res = await fetch('/resend-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: storedEmail })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          errorMsg.textContent = 'New verification code sent to your email!';
+          errorMsg.classList.add('text-green-600');
+          errorMsg.classList.remove('text-red-600');
+          setTimeout(() => {
+            errorMsg.textContent = '';
+            errorMsg.classList.add('text-red-600');
+            errorMsg.classList.remove('text-green-600');
+          }, 3000);
+        } else {
+          errorMsg.textContent = data.message || 'Failed to resend code.';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Network error. Please try again.';
+        console.error('Resend error:', error);
+      } finally {
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend Verification Code';
       }
     });
   </script>
 </body>
+
 </html>
