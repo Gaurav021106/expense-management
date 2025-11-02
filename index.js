@@ -84,9 +84,10 @@ app.post('/create', async (req, res) => {
     res.status(201).json({ success: true, message: 'User created. Verification code sent to email.' });
   } catch (error) {
     if (error.code === 11000) {
-      let field = Object.keys(error.keyPattern)[0];
-      res.status(400).json({ success: false, message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.` });
-    } else {
+  // Use a fallback if error.keyPattern is undefined
+  let field = error.keyPattern ? Object.keys(error.keyPattern)[0] : 'Field';
+  res.status(400).json({ success: false, message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.` });
+}} else {
       console.error('Error creating user:', error);
       res.status(500).json({ success: false, message: 'Server error' });
     }
