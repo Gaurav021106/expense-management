@@ -49,7 +49,14 @@ function ensureLoggedIn(req, res, next) {
 // ======== Routes ========
 app.get('/', (req, res) => res.render('./auth/login'));
 app.get('/signup', (req, res) => res.render('./auth/signup'));
-app.get('/home', ensureLoggedIn, (req, res) => res.render('./page/home'));
+app.get('/home', ensureLoggedIn, async (req, res) => {
+  const userId = req.session.userId;
+  // Calculate budget, totalExpense, remaining, etc.
+  let budget = 0; // replace with actual logic
+  let totalExpense = 0; // sum from expenses
+  let remaining = budget - totalExpense;
+  res.render('./page/home', { budget, totalExpense, remaining });
+});
 
 // ======== User Signup Route ========
 app.post('/create', async (req, res) => {
