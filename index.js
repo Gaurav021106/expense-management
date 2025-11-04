@@ -12,7 +12,7 @@ require('dotenv').config();
 
 
 // ======== Database ========
-mongoose.connect('mongodb://localhost:27017/Expense-managementDB', {
+mongoose.connect('mongodb+srv://gauravsaklani021106_db_user:<db_password>@expensemanagements.t6igj19.mongodb.net/?appName=ExpenseManagements', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
