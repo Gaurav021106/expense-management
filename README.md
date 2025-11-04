@@ -3,31 +3,21 @@ A full-stack expense management web application built with Node.js, Express, Mon
 
 Features
 User Signup with Email Verification
-
 Login & Logout with session management
-
 Add, View & Delete Expenses
-
 Budget, Total Expenses, Remaining Calculation
-
 Responsive UI with Tailwind Utility Classes
-
 Secure Password Hashing (bcrypt)
-
 Email Notifications (nodemailer)
 
 Tech Stack
 Backend: Node.js, Express, MongoDB, Mongoose
-
 Frontend: EJS Templates, Tailwind CSS (utility classes)
-
 Authentication: Express-session, Connect-mongo
-
 Mail Service: Nodemailer, Gmail SMTP
-
 Password Security: bcrypt
-
 Environment Variables: dotenv
+
 
 Getting Started
 Prerequisites
@@ -67,16 +57,12 @@ The server runs on http://localhost:8000.
 
 Usage
 Signup: Enter your details and verify your email using the code sent to your inbox.
-
 Login: Log in after verification.
-
 Add Expenses: Enter name, amount, and date to track your spending.
-
 View Expenses: See the list of expenses and overall amount.
-
 Delete Expenses: Remove any expense entry.
-
 Budget Management: Set your budget and see remaining balance.
+
 
 Project Structure
 text
@@ -94,8 +80,10 @@ expense-management/
 │       └── signup.ejs
 ├── .env                  # Environment variables
 ├── package.json
+
 Contributing
 Feel free to fork this repo and create pull requests for new features or bug fixes. Feedback and suggestions are always welcome!
+
 
 License
 This project is licensed under the ISC License.
