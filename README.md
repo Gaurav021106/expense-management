@@ -81,6 +81,7 @@ expense-management/
 ├── .env                  # Environment variables
 ├── package.json
 
+
 Contributing
 Feel free to fork this repo and create pull requests for new features or bug fixes. Feedback and suggestions are always welcome!
 
